@@ -1,0 +1,1079 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Jardín del 21</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,400;0,600;0,700;1,600&family=Pixelify+Sans:wght@400;500;600;700&family=Press+Start+2P&display=swap">
+<style>
+  :root{
+    --ink:#2A1E10;
+    --cream:#FFF6D8;
+    --gold:#F6C945;
+    --gold-deep:#C8811A;
+    --leaf:#2F5B2A;
+    --leaf-dark:#1C3A1B;
+    --panel:#20321C;
+    --sky:#8FD8F2;
+  }
+  html,body{height:100%;}
+  body{
+    margin:0;
+    background:var(--sky);
+    overflow:hidden;
+    color:var(--cream);
+    font-family:"Nunito","Avenir Next","Helvetica Neue",Arial,sans-serif;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .stage{position:fixed;inset:0;overflow:hidden;background:var(--sky);touch-action:manipulation;}
+  canvas#scene{
+    position:absolute;left:50%;top:50%;
+    transform:translate(-50%,-50%);
+    image-rendering:pixelated;
+    image-rendering:crisp-edges;
+    display:block;
+  }
+
+  .overlay{
+    position:absolute;inset:0;
+    display:flex;flex-direction:column;
+    pointer-events:none;
+    padding:calc(env(safe-area-inset-top,0px) + 16px) 16px calc(env(safe-area-inset-bottom,0px) + 14px);
+    box-sizing:border-box;
+  }
+
+  .titleblock{
+    flex:1 1 auto;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:10px;text-align:center;
+    min-height:0;
+  }
+  .eyebrow{
+    font-family:"Press Start 2P",monospace;
+    font-size:clamp(7px,1.8vw,11px);
+    letter-spacing:.14em;
+    color:#3B2A12;
+    text-shadow:0 1px 0 rgba(255,255,255,.55);
+  }
+  .dedic{
+    font-size:clamp(14px,3.4vw,19px);
+    font-weight:500;
+    color:#3B2A12;
+    text-shadow:0 1px 0 rgba(255,255,255,.5);
+    margin:0;
+  }
+  h1{
+    margin:0;
+    font-family:"Pixelify Sans","Trebuchet MS",sans-serif;
+    font-weight:700;
+    font-size:clamp(38px,11.5vw,96px);
+    line-height:.95;
+    letter-spacing:.01em;
+    color:var(--cream);
+    text-wrap:balance;
+    text-shadow:
+      3px 0 0 var(--gold-deep), -3px 0 0 var(--gold-deep),
+      0 3px 0 var(--gold-deep), 0 -3px 0 var(--gold-deep),
+      3px 3px 0 var(--gold-deep), -3px 3px 0 var(--gold-deep),
+      6px 7px 0 rgba(40,28,8,.22);
+    animation:bob 4.2s ease-in-out infinite;
+  }
+  .sub{
+    font-size:clamp(14px,3.5vw,21px);
+    font-weight:600;
+    color:#3A2B0C;
+    text-shadow:0 1px 0 rgba(255,255,255,.5);
+  }
+  @keyframes bob{50%{transform:translateY(-4px);}}
+
+     .foot{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:10px;}
+  .ig{
+    position:relative;
+    transition:transform .36s cubic-bezier(.34,1.32,.62,1);
+    will-change:transform;
+    pointer-events:auto;
+    width:min(430px,100%);
+    background:var(--gold);
+    padding:3px;
+    box-sizing:border-box;
+    clip-path:polygon(6px 0,calc(100% - 6px) 0,100% 6px,100% calc(100% - 6px),calc(100% - 6px) 100%,6px 100%,0 calc(100% - 6px),0 6px);
+    box-shadow:0 6px 0 rgba(30,22,6,.18);
+  }
+  .ig-in{
+    background:#16220F;
+    padding:14px 16px 16px;
+    display:flex;flex-direction:column;gap:11px;
+    clip-path:polygon(5px 0,calc(100% - 5px) 0,100% 5px,100% calc(100% - 5px),calc(100% - 5px) 100%,5px 100%,0 calc(100% - 5px),0 5px);
+  }
+  .ig-top{
+    font-family:"Press Start 2P",monospace;
+    font-size:clamp(7px,1.9vw,10px);
+    letter-spacing:.09em;color:#FFD24A;text-align:center;line-height:1.7;
+  }
+  .ig-row{display:flex;align-items:center;gap:10px;}
+  .ig-lab{
+    flex:0 0 auto;width:clamp(62px,19vw,86px);
+    font-size:clamp(11px,2.9vw,13px);font-weight:700;color:#9FBC8D;
+  }
+  .ig-val{
+    flex:1 1 auto;min-width:0;
+    background:#0D160A;border:2px solid #36502A;
+    padding:9px 11px;
+    font-size:clamp(13px,3.5vw,16px);
+    color:#FFFCF0;letter-spacing:.04em;
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  }
+  .ig-val.puntos{letter-spacing:.22em;color:#E8DFC4;}
+  .ig-btn{
+    align-self:center;
+    display:inline-flex;align-items:center;gap:9px;
+    border:0;cursor:pointer;
+    background:var(--gold);color:#16220F;
+    font-family:"Nunito",Arial,sans-serif;font-weight:700;
+    font-size:clamp(12px,3.3vw,15px);
+    padding:10px 16px;
+    clip-path:polygon(5px 0,calc(100% - 5px) 0,100% 5px,100% calc(100% - 5px),calc(100% - 5px) 100%,5px 100%,0 calc(100% - 5px),0 5px);
+    box-shadow:0 4px 0 #9A5F12;
+  }
+  .ig-btn:active{transform:translateY(2px);box-shadow:0 2px 0 #9A5F12;}
+  .ig-btn:focus-visible{outline:3px solid #fff;outline-offset:3px;}
+  .ig-btn svg{display:block;}
+  .ig-pie{
+    font-size:clamp(11px,2.9vw,13px);
+    color:#C9D9B8;text-align:center;min-height:1.3em;
+    transition:color .25s ease;
+  }
+  .ig-pie.burla{color:#FFD24A;font-weight:700;}
+  @keyframes pop{0%{transform:scale(.7);opacity:.15}60%{transform:scale(1.1)}100%{transform:scale(1);opacity:1}}
+  .ig-pie.pop{animation:pop .36s ease;}
+  .hintrow{
+    display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center;
+    font-size:clamp(12px,3.1vw,15px);
+    font-weight:600;
+    color:#FFF3CF;
+    background:rgba(20,32,14,.8);
+    padding:7px 15px;
+    clip-path:polygon(5px 0,calc(100% - 5px) 0,100% 5px,100% calc(100% - 5px),calc(100% - 5px) 100%,5px 100%,0 calc(100% - 5px),0 5px);
+    transition:opacity .8s ease;
+  }
+  .hintrow.fade{opacity:.35;}
+  .count{
+    font-family:"Press Start 2P",monospace;
+    font-size:clamp(7px,1.7vw,10px);
+    color:#FFD24A;
+  }
+
+  .music{
+    position:absolute;
+    top:calc(env(safe-area-inset-top,0px) + 14px);
+    right:14px;
+    pointer-events:auto;
+    width:42px;height:42px;
+    display:grid;place-items:center;
+    border:0;cursor:pointer;
+    background:var(--gold);
+    color:var(--panel);
+    font-family:"Press Start 2P",monospace;
+    font-size:13px;
+    clip-path:polygon(5px 0,calc(100% - 5px) 0,100% 5px,100% calc(100% - 5px),calc(100% - 5px) 100%,5px 100%,0 calc(100% - 5px),0 5px);
+    box-shadow:0 4px 0 rgba(30,22,6,.2);
+  }
+  .music:active{transform:translateY(2px);box-shadow:0 2px 0 rgba(30,22,6,.2);}
+  .music:focus-visible{outline:3px solid #fff;outline-offset:3px;}
+  .music.off{background:#9AA88C;}
+
+  .gate{
+    position:absolute;inset:0;z-index:5;
+    display:grid;place-items:center;
+    background:linear-gradient(180deg,rgba(16,30,14,.28),rgba(10,20,10,.58));
+    padding:20px;box-sizing:border-box;
+    transition:opacity .7s ease;
+    pointer-events:auto;
+  }
+  .gate.off{opacity:0;pointer-events:none;}
+  .gatebox{
+    text-align:center;display:flex;flex-direction:column;align-items:center;gap:14px;
+    max-width:420px;
+    background:rgba(24,38,20,.93);
+    padding:26px 24px 28px;
+    box-shadow:0 0 0 3px var(--gold);
+    clip-path:polygon(8px 0,calc(100% - 8px) 0,100% 8px,100% calc(100% - 8px),calc(100% - 8px) 100%,8px 100%,0 calc(100% - 8px),0 8px);
+  }
+  .gatebox h2{
+    margin:0;font-family:"Pixelify Sans","Trebuchet MS",sans-serif;font-weight:700;
+    font-size:clamp(26px,7.5vw,44px);
+    color:var(--cream);
+    text-shadow:3px 3px 0 var(--gold-deep);
+  }
+  .gatebox p{margin:0;font-size:clamp(14px,3.6vw,17px);font-weight:600;color:#F0E6C4;line-height:1.6;}
+  .btn{
+    margin-top:4px;
+    border:0;cursor:pointer;
+    background:var(--gold);color:var(--panel);
+    font-family:"Nunito",sans-serif;
+    font-weight:700;
+    font-size:clamp(15px,4vw,20px);
+    padding:14px 26px;
+    clip-path:polygon(7px 0,calc(100% - 7px) 0,100% 7px,100% calc(100% - 7px),calc(100% - 7px) 100%,7px 100%,0 calc(100% - 7px),0 7px);
+    box-shadow:0 6px 0 #9A5F12;
+    transition:transform .12s ease,box-shadow .12s ease;
+  }
+  .btn:hover{transform:translateY(-2px);box-shadow:0 8px 0 #9A5F12;}
+  .btn:active{transform:translateY(4px);box-shadow:0 2px 0 #9A5F12;}
+  .btn:focus-visible{outline:3px solid #fff;outline-offset:4px;}
+
+  .titleblock,.foot{transition:opacity .9s ease;}
+  .stage.celebrando .titleblock,
+  .stage.celebrando .foot,
+  .stage.celebrando .hintrow{opacity:0;pointer-events:none;}
+  .cheer{
+    position:absolute;left:50%;top:63%;transform:translate(-50%,-50%);
+    width:min(92vw,640px);
+    text-align:center;pointer-events:none;
+    opacity:0;transition:opacity 1s ease;
+  }
+  .cheer.on{opacity:1;}
+  .cheer .big{
+    font-weight:700;font-size:clamp(24px,7vw,52px);color:var(--cream);
+    text-shadow:3px 3px 0 #B8354A,6px 7px 0 rgba(40,28,8,.25);
+  }
+  .cheer .small{
+    font-family:"Press Start 2P",monospace;
+    font-size:clamp(8px,2vw,12px);letter-spacing:.1em;color:#FFE9A8;
+    text-shadow:2px 2px 0 rgba(40,28,8,.45);
+    margin-top:10px;
+  }
+
+  @media (prefers-reduced-motion:reduce){
+    h1{animation:none;}
+    .btn{transition:none;}
+  }
+</style>
+
+<div class="stage">
+  <canvas id="scene"></canvas>
+  <audio id="song" src="assets/musica.mp3" loop preload="auto"></audio>
+
+  <div class="overlay">
+    <header class="titleblock">
+      <div class="eyebrow">21 DE SEPTIEMBRE DE 2026</div>
+      <p class="dedic" id="dedic" hidden></p>
+      <h1>¡Feliz Primavera!</h1>
+      <div class="sub">Con cariño, Mohammed</div>
+    </header>
+
+    <div class="foot">
+      <div class="hintrow" id="hintrow">
+        <span id="hint">Toca el campo para sembrar más flores</span>
+        <span class="count" id="count">FLORES 0</span>
+      </div>
+      <div class="ig" id="ig">
+        <div class="ig-in">
+          <div class="ig-top">TE REGALO MI INSTAGRAM</div>
+          <div class="ig-row">
+            <span class="ig-lab">Usuario</span>
+            <span class="ig-val" id="iguser">@mohammed_moussa</span>
+          </div>
+          <div class="ig-row ig-pass" id="igrow">
+            <span class="ig-lab">Contraseña</span>
+            <span class="ig-val puntos">&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;</span>
+          </div>
+          <button class="ig-btn" id="igbtn"><span id="igicon"></span>Ver contraseña</button>
+          <div class="ig-pie" id="igpie">Toca el botón para verla</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="cheer" id="cheer">
+    <div class="big">21 flores para el 21</div>
+    <div class="small">GRACIAS POR EXISTIR</div>
+  </div>
+
+  <button class="music" id="music" aria-label="Activar o silenciar la música">&#9834;</button>
+
+  <div class="gate" id="gate">
+    <div class="gatebox">
+      <div class="eyebrow" style="color:#F6C945;text-shadow:none">21 DE SEPTIEMBRE DE 2026</div>
+      <h2>Un jardín para ti</h2>
+      <p>Con música. Sube un poquito el volumen y toca el botón.</p>
+      <button class="btn" id="go">Abrir el jardín &#9834;</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+/* ---------------------------------------------------------------
+   JARDIN DEL 21 — escena de arte pixel dibujada por codigo
+   Todo se pinta en un lienzo de baja resolucion y se escala con
+   image-rendering:pixelated, asi cada pixel queda cuadrado y duro.
+----------------------------------------------------------------*/
+
+var TAU = Math.PI * 2;
+var cv  = document.getElementById('scene');
+var ctx = cv.getContext('2d', { alpha:false });
+
+var W = 0, H = 0, S = 3, horizon = 0;
+var bg = document.createElement('canvas');
+var bgx = bg.getContext('2d');
+
+var flowers = [], petals = [], clouds = [], birds = [], sparks = [];
+var plantedNorm = [];          // flores sembradas, en coordenadas normalizadas
+var plantedCount = 0;
+var heart = null;
+var t = 0, lastTs = 0, frame = 0;
+
+/* ---------- ruido reproducible ---------- */
+function mulberry32(a){ return function(){ a|=0; a=a+0x6D2B79F5|0; var x=Math.imul(a^a>>>15,1|a); x=x+Math.imul(x^x>>>7,61|x)^x; return ((x^x>>>14)>>>0)/4294967296; }; }
+var rnd = mulberry32(210921);
+function rr(a,b){ return a + rnd()*(b-a); }
+function pickR(arr){ return arr[(rnd()*arr.length)|0]; }
+function pick(arr){ return arr[(Math.random()*arr.length)|0]; }
+
+/* ---------- paletas ---------- */
+var SKY   = ['#4FBFEA','#6BCBEF','#88D8F3','#A6E3F6','#C6EDF8','#E6F5F0','#FBF0CA','#FFE7B0'];
+var GRASS = ['#C2DE72','#A6CE5E','#86B84C','#6BA040','#548736','#42702E','#35602A'];
+var BAYER = [[0,8,2,10],[12,4,14,6],[3,11,1,9],[15,7,13,5]];
+
+/* [0] brillo, [1] amarillo pleno, [2] sombra dorada */
+var SUN_PALS = [
+  ['#FFF0A8','#FFC81C','#D2870B'],
+  ['#FFE88C','#FDB90E','#BE7708'],
+  ['#FFF3B8','#FFD52E','#DE9611']
+];
+var ROSE_PALS = [
+  ['#E89A15','#FFC12B','#FFDC66','#FFF0B6'],
+  ['#D98B12','#F7B622','#FFD45A','#FFEBA4'],
+  ['#F0A81C','#FFCB42','#FFE47E','#FFF7CC']
+];
+var STEMS = [['#4E8C38','#3A6B2A'],['#5A9A3E','#437A30'],['#457F33','#335F27']];
+
+/* ---------- helpers de pixel ---------- */
+function ell(g,cx,cy,rx,ry,c){
+  if(rx<=0||ry<=0) return;
+  g.fillStyle=c;
+  var top=Math.ceil(ry);
+  for(var y=-top;y<=top;y++){
+    var v=1-(y*y)/(ry*ry);
+    if(v<=0) continue;
+    var w=Math.floor(rx*Math.sqrt(v));
+    g.fillRect(Math.round(cx-w),Math.round(cy+y),2*w+1,1);
+  }
+}
+function disc(g,cx,cy,r,c){ ell(g,cx,cy,r,r,c); }
+function dot(g,x,y,c){ g.fillStyle=c; g.fillRect(Math.round(x),Math.round(y),1,1); }
+
+/* petalo alargado que sale del centro hacia el angulo a */
+function petal(g,cx,cy,a,r0,r1,pw,cEdge,cFill){
+  var dx=Math.cos(a), dy=Math.sin(a), px=-dy, py=dx;
+  var L=Math.max(2,Math.round(r1-r0));
+  for(var j=0;j<=L;j++){
+    var rad=r0+j;
+    var w=Math.round(pw*Math.sin(Math.PI*(j+0.7)/(L+1.4)));
+    if(w<0) w=0;
+    for(var k=-w;k<=w;k++){
+      g.fillStyle=(cFill && Math.abs(k)<w) ? cFill : cEdge;
+      g.fillRect(Math.round(cx+dx*rad+px*k), Math.round(cy+dy*rad+py*k), 1, 1);
+    }
+  }
+}
+
+/* ---------- cache de cabezas de flor ---------- */
+var headCache = {};
+function getHead(type,r,vi){
+  var key = type+'|'+r+'|'+vi;
+  if(headCache[key]) return headCache[key];
+  var size = Math.max(7, Math.ceil(r*4)|1);
+  var c = document.createElement('canvas');
+  c.width=size; c.height=size;
+  var g=c.getContext('2d'); g.imageSmoothingEnabled=false;
+  var cx=size>>1, cy=size>>1;
+  if(type==='sun')       paintSunflower(g,cx,cy,r,vi);
+  else if(type==='rose') paintRose(g,cx,cy,r,vi);
+  else if(type==='tulip')paintTulip(g,cx,cy,r,vi);
+  else                   paintDaisy(g,cx,cy,r,vi);
+  var o={c:c,cx:cx,cy:cy,w:size,h:size};
+  headCache[key]=o;
+  return o;
+}
+
+function paintSunflower(g,cx,cy,r,vi){
+  var p = SUN_PALS[vi%3];
+  var n = r<4?9:(r<6?12:16);
+  var off = vi*0.41;
+  var i,a;
+  /* capa trasera, mas oscura y girada medio paso */
+  for(i=0;i<n;i++){
+    a = i/n*TAU + off + TAU/(n*2);
+    petal(g,cx,cy,a, r*0.42, r*1.48, Math.max(1,r*0.24), p[2], p[2]);
+  }
+  /* capa brillante */
+  for(i=0;i<n;i++){
+    a = i/n*TAU + off;
+    petal(g,cx,cy,a, r*0.38, r*1.62, Math.max(1,r*0.30), p[2], p[1]);
+  }
+  /* corazon de semillas */
+  var cr = Math.max(1.6, r*0.6);
+  disc(g,cx,cy,cr,'#6E421C');
+  var rr0=Math.ceil(cr);
+  for(var y=-rr0;y<=rr0;y++) for(var x=-rr0;x<=rr0;x++){
+    if(x*x+y*y > cr*cr) continue;
+    if(((x+y)&1)===0) dot(g,cx+x,cy+y,'#8A5426');
+    else if(((x*3+y)&3)===0) dot(g,cx+x,cy+y,'#4E2D12');
+  }
+  disc(g,cx-cr*0.3,cy-cr*0.32,Math.max(0.9,cr*0.3),'#A06A31');
+  if(r>=5){
+    for(i=0;i<n;i+=2){
+      a=i/n*TAU+off;
+      dot(g,cx+Math.cos(a)*(r*1.32), cy+Math.sin(a)*(r*1.32), p[0]);
+    }
+  }
+}
+
+function paintRose(g,cx,cy,r,vi){
+  var p = ROSE_PALS[vi%3];
+  var i,a;
+  /* bultos externos para romper el circulo */
+  for(i=0;i<5;i++){
+    a=i/5*TAU + vi*0.7;
+    disc(g,cx+Math.cos(a)*r*0.74, cy+Math.sin(a)*r*0.74, Math.max(1.3,r*0.46), p[0]);
+  }
+  disc(g,cx,cy,Math.max(2,r*0.98),p[1]);
+  disc(g,cx,cy,Math.max(1.4,r*0.68),p[2]);
+  disc(g,cx,cy,Math.max(1,r*0.36),p[3]);
+  /* espiral interior */
+  for(var s=0.4;s<Math.PI*2.6;s+=0.22){
+    var rad=r*0.14+s*r*0.13;
+    if(rad>r*0.92) break;
+    dot(g,cx+Math.cos(s+vi)*rad, cy+Math.sin(s+vi)*rad, p[0]);
+  }
+  /* sombra abajo, luz arriba */
+  for(i=0;i<9;i++){
+    a=Math.PI*0.18 + i/9*Math.PI*0.64;
+    dot(g,cx+Math.cos(a)*r*0.88, cy+Math.sin(a)*r*0.88, p[0]);
+  }
+  dot(g,cx-Math.round(r*0.4), cy-Math.round(r*0.5), p[3]);
+}
+
+function paintTulip(g,cx,cy,r,vi){
+  var p = ROSE_PALS[(vi+1)%3];
+  var rx=Math.max(1.4,r*0.62), ry=Math.max(2,r*1.05);
+  ell(g,cx,cy+r*0.15,Math.max(1.8,r*0.85),ry*0.92,p[0]);
+  ell(g,cx-r*0.42,cy,rx,ry,p[1]);
+  ell(g,cx+r*0.42,cy,rx,ry,p[1]);
+  ell(g,cx,cy-r*0.12,rx*1.05,ry,p[2]);
+  dot(g,cx,cy-Math.round(ry*0.7),p[3]);
+  dot(g,cx-1,cy-Math.round(ry*0.5),p[3]);
+}
+
+function paintDaisy(g,cx,cy,r,vi){
+  var n = r<3?5:7;
+  var p = SUN_PALS[(vi+2)%3];
+  for(var i=0;i<n;i++){
+    var a=i/n*TAU+vi;
+    petal(g,cx,cy,a,r*0.3,r*1.25,Math.max(1,r*0.34),p[2],p[0]);
+  }
+  disc(g,cx,cy,Math.max(0.9,r*0.34),'#E6902A');
+  dot(g,cx,cy,'#B96C12');
+}
+
+/* ---------- hojas y tallos ---------- */
+function drawLeaf(g,x,y,dir,len,c1,c2){
+  for(var i=1;i<=len;i++){
+    var h=Math.round(Math.sin(i/len*Math.PI)*len*0.45);
+    for(var k=-h;k<=h;k++){
+      g.fillStyle = k>0 ? c2 : c1;
+      g.fillRect(Math.round(x+dir*i), Math.round(y+k-i*0.32), 1, 1);
+    }
+  }
+}
+
+/* ---------- construccion de la escena ---------- */
+function build(){
+  rnd = mulberry32(210921);
+  horizon = Math.round(H*0.58);
+  flowers = []; petals = []; clouds = []; birds = []; sparks = [];
+
+  /* filas de profundidad: lejos = chiquitas y palidas */
+  var rows = 8;
+  for(var b=0;b<rows;b++){
+    var depth = b/(rows-1);
+    var rowY  = horizon + 2 + Math.round(Math.pow(depth,1.5)*(H-horizon-2));
+    var spacing = 9 + depth*20;
+    var count = Math.max(3, Math.round(W/spacing));
+    for(var i=0;i<count;i++){
+      var x = (i+rr(-0.45,0.45))*(W/count) + rr(-3,3);
+      var y = rowY + rr(-2,3)*(0.5+depth);
+      flowers.push(makeFlower(x,y,depth));
+    }
+  }
+  flowers.sort(function(a,b){ return a.y-b.y; });
+
+  /* re-sembrar lo que la persona ya planto */
+  for(var k=0;k<plantedNorm.length;k++){
+    var pn=plantedNorm[k];
+    addPlanted(pn.nx*W, pn.ny*H, true);
+  }
+
+  /* nubes */
+  var nc = 3 + Math.round(W/150);
+  for(var c=0;c<nc;c++) clouds.push(makeCloud(rr(0,W), rr(6, horizon*0.5), rr(0.6,1.5)));
+
+  /* pajaritos lejanos */
+  for(var p=0;p<3;p++) birds.push({x:rr(0,W), y:rr(horizon*0.18,horizon*0.42), s:rr(2.2,5), ph:rr(0,TAU)});
+
+  /* petalos en el viento */
+  var np = 26 + Math.round(W/12);
+  for(var q=0;q<np;q++) petals.push(makePetal(rr(0,W), rr(0,H)));
+
+  drawBackground();
+}
+
+function makeFlower(x,y,depth){
+  var roll = rnd();
+  var type;
+  if(depth < 0.3)      type = roll<0.38 ? 'daisy' : (roll<0.7 ? 'sun' : 'rose');
+  else if(depth < 0.7) type = roll<0.36 ? 'sun'   : (roll<0.7 ? 'rose' : (roll<0.86?'tulip':'daisy'));
+  else                 type = roll<0.46 ? 'sun'   : (roll<0.84? 'rose' : 'tulip');
+
+  var base = 1.6 + depth*7.4;
+  var r = Math.max(2, Math.round(base*rr(0.78,1.2)));
+  if(type==='daisy') r = Math.max(2, Math.round(r*0.62));
+  if(type==='tulip') r = Math.max(2, Math.round(r*0.82));
+  var st = pickR(STEMS);
+  return {
+    type:type, x:x, y:y, r:r, vi:(rnd()*3)|0, depth:depth,
+    h: Math.max(3, Math.round(r*rr(2.4,3.9))),
+    thick: r>6?2:1,
+    sw: (0.5 + depth*2.4)*rr(0.6,1.35),
+    sp: rr(0.45,0.95),
+    ph: rr(0,TAU),
+    stemC: st[0], stemD: st[1],
+    leaf: rnd()<0.75,
+    alpha: 0.5 + depth*0.5,
+    grow: 1
+  };
+}
+
+function addPlanted(x,y,silent){
+  var depth = Math.min(1, Math.max(0.12, (y-horizon)/Math.max(1,(H-horizon))));
+  var f = makeFlower(x,y,depth);
+  f.type = Math.random()<0.55 ? 'sun' : (Math.random()<0.7 ? 'rose' : 'tulip');
+  f.r = Math.max(3, Math.round((2.6+depth*7)*1.05));
+  f.h = Math.max(4, Math.round(f.r*3.1));
+  f.alpha = Math.min(1, 0.62+depth*0.5);
+  f.grow = silent ? 1 : 0;
+  flowers.push(f);
+  flowers.sort(function(a,b){ return a.y-b.y; });
+  return f;
+}
+
+function makeCloud(x,y,s){
+  var puffs=[], n=3+((rnd()*3)|0);
+  for(var i=0;i<n;i++) puffs.push([ (i-(n-1)/2)*4.6*s + rr(-1,1), rr(-1.6,1.6)*s, (2.6+rnd()*2.6)*s ]);
+  return { x:x, y:y, s:s, spd:(0.9+rnd()*1.4)*s*0.22, puffs:puffs };
+}
+
+function makePetal(x,y){
+  return { x:x, y:y, vx:rr(3,11), vy:rr(2.5,8), ph:rr(0,TAU), sp:rr(1.4,3.2),
+           c:pickR(['#FFE175','#FFD23F','#FFB627','#FFF0B8']), big:rnd()<0.4 };
+}
+
+/* ---------- fondo estatico ---------- */
+function drawBackground(){
+  bg.width=W; bg.height=H;
+  var g=bgx; g.imageSmoothingEnabled=false;
+  var x,y,u,idx,i0,f,c0,c1;
+
+  /* cielo con degradado tramado (dithering Bayer 4x4) */
+  for(y=0;y<horizon;y++){
+    u = y/Math.max(1,horizon-1);
+    idx = u*(SKY.length-1); i0=Math.floor(idx); f=idx-i0;
+    c0 = SKY[i0]; c1 = SKY[Math.min(SKY.length-1,i0+1)];
+    g.fillStyle=c0; g.fillRect(0,y,W,1);
+    if(f>0.04){
+      g.fillStyle=c1;
+      for(x=0;x<W;x++) if(BAYER[y&3][x&3]/16 < f) g.fillRect(x,y,1,1);
+    }
+  }
+
+  /* sol con halo */
+  var sunX=Math.round(W*0.79), sunY=Math.round(horizon*0.26);
+  var sunR=Math.max(6,Math.round(Math.min(W,H)*0.042));
+  g.globalAlpha=0.16; disc(g,sunX,sunY,sunR*2.4,'#FFF4C4');
+  g.globalAlpha=0.22; disc(g,sunX,sunY,sunR*1.7,'#FFF0AE');
+  g.globalAlpha=1;
+  disc(g,sunX,sunY,sunR,'#FFF3B0');
+  disc(g,sunX,sunY,sunR*0.72,'#FFFBE2');
+  for(var a=0;a<12;a++){
+    var an=a/12*TAU+0.2;
+    var rr1=sunR*1.35, rr2=sunR*(a%2?1.6:1.95);
+    for(var s=rr1;s<rr2;s++) dot(g,sunX+Math.cos(an)*s, sunY+Math.sin(an)*s, '#FFE98C');
+  }
+
+  /* colinas suaves detras del campo */
+  hill(g, horizon-Math.round(H*0.055), H*0.035, 0.019, '#7FB36A', '#9CC97F');
+  hill(g, horizon-Math.round(H*0.018), H*0.022, 0.031, '#63994F', '#83B767');
+
+  /* pasto con tramado */
+  var gh=Math.max(1,H-horizon);
+  for(y=horizon;y<H;y++){
+    u=(y-horizon)/gh;
+    idx=Math.pow(u,0.85)*(GRASS.length-1); i0=Math.floor(idx); f=idx-i0;
+    c0=GRASS[i0]; c1=GRASS[Math.min(GRASS.length-1,i0+1)];
+    g.fillStyle=c0; g.fillRect(0,y,W,1);
+    if(f>0.04){
+      g.fillStyle=c1;
+      for(x=0;x<W;x++) if(BAYER[y&3][x&3]/16 < f) g.fillRect(x,y,1,1);
+    }
+  }
+
+  /* briznas y florecitas de textura */
+  var blades=Math.round(W*gh/14);
+  for(var i=0;i<blades;i++){
+    var bx=Math.round(rr(0,W)), by=Math.round(rr(horizon+1,H));
+    var d=(by-horizon)/gh;
+    var bh=Math.max(1,Math.round(1+d*4*rnd()));
+    var col = rnd()<0.5 ? '#3B6B2C' : '#9CC95A';
+    if(d<0.35) col = rnd()<0.5 ? '#79AE52' : '#B6D96C';
+    g.fillStyle=col; g.fillRect(bx,by-bh,1,bh);
+    if(rnd()<0.045) dot(g,bx+1,by-bh,'#FFF3C0');
+  }
+  bgx.imageSmoothingEnabled=false;
+}
+
+function hill(g,baseY,amp,freq,col,top){
+  for(var x=0;x<W;x++){
+    var y=Math.round(baseY - (Math.sin(x*freq)*amp + Math.sin(x*freq*2.7+1.9)*amp*0.45));
+    g.fillStyle=col; g.fillRect(x,y,1,Math.max(1,horizon+2-y));
+    g.fillStyle=top; g.fillRect(x,y,1,1);
+  }
+}
+
+/* ---------- abeja ---------- */
+var beeSprite=null;
+function buildBee(){
+  var w=15,h=11;
+  var c=document.createElement('canvas'); c.width=w; c.height=h;
+  var g=c.getContext('2d'); g.imageSmoothingEnabled=false;
+  var cx=6, cy=6;
+  /* abdomen con rayas */
+  var rx=4.2, ry=2.7;
+  for(var y=-3;y<=3;y++){
+    var v=1-(y*y)/(ry*ry); if(v<=0) continue;
+    var ww=Math.floor(rx*Math.sqrt(v));
+    for(var x=-ww;x<=ww;x++){
+      var stripe = ((x+5)%3===0);
+      var c1 = stripe ? '#241B12' : (y>1 ? '#E0990F' : '#FFC61E');
+      dot(g,cx+x,cy+y,c1);
+    }
+  }
+  dot(g,cx-4,cy,'#241B12');           /* aguijon */
+  dot(g,cx-5,cy,'#241B12');
+  disc(g,cx+5,cy-0.4,2.1,'#241B12');  /* cabeza */
+  dot(g,cx+6,cy-1,'#FFFFFF');
+  dot(g,cx+7,cy+1,'#241B12');
+  dot(g,cx+6,cy-3,'#241B12');         /* antenas */
+  dot(g,cx+7,cy-4,'#241B12');
+  dot(g,cx-1,cy+3,'#241B12');         /* patitas */
+  dot(g,cx+2,cy+3,'#241B12');
+  beeSprite={c:c,cx:cx,cy:cy};
+}
+
+function drawBee(){
+  if(!beeSprite) buildBee();
+  var bx = W*0.5 + Math.sin(t*0.33)*W*0.33 + Math.sin(t*0.79+1.2)*W*0.05;
+  var by = horizon*0.66 + Math.sin(t*0.71)*H*0.09 + Math.cos(t*0.27)*3;
+  var dir = Math.cos(t*0.33) >= 0 ? 1 : -1;
+  var flap = (frame % 6 < 3) ? 1.9 : 0.8;
+
+  ctx.save();
+  ctx.translate(Math.round(bx), Math.round(by));
+  ctx.scale(dir,1);
+  /* alas translucidas */
+  ctx.globalAlpha=0.55;
+  ell(ctx,-1,-4.5,3.2,flap,'#EAFBFF');
+  ell(ctx, 3,-4.8,2.6,flap*0.9,'#D6F3FD');
+  ctx.globalAlpha=1;
+  ctx.drawImage(beeSprite.c, -beeSprite.cx, -beeSprite.cy);
+  ctx.restore();
+
+  /* estelita de polen */
+  if(frame%7===0) sparks.push({x:bx-dir*7,y:by+2,life:0,max:0.9,c:'#FFF0A8'});
+}
+
+/* ---------- bucle ---------- */
+function loop(ts){
+  requestAnimationFrame(loop);
+  var dt = lastTs ? Math.min(0.05,(ts-lastTs)/1000) : 0.016;
+  lastTs = ts; t += dt; frame++;
+
+  ctx.drawImage(bg,0,0);
+
+  /* nubes */
+  var i,c;
+  for(i=0;i<clouds.length;i++){
+    c=clouds[i];
+    c.x += c.spd*dt;
+    if(c.x - 18*c.s > W) c.x = -18*c.s;
+    for(var p=0;p<c.puffs.length;p++) disc(ctx,c.x+c.puffs[p][0],c.y+c.puffs[p][1]+1,c.puffs[p][2]*0.9,'#DCEFF8');
+    for(p=0;p<c.puffs.length;p++)      disc(ctx,c.x+c.puffs[p][0],c.y+c.puffs[p][1],c.puffs[p][2],'#FFFFFF');
+  }
+
+  /* pajaritos */
+  for(i=0;i<birds.length;i++){
+    var b=birds[i];
+    b.x += (6+b.s)*dt*0.6;
+    if(b.x>W+6) b.x=-6;
+    var wing=Math.sin(t*5+b.ph)>0?1:0;
+    ctx.fillStyle='#4A6B78';
+    ctx.fillRect(Math.round(b.x),Math.round(b.y),1,1);
+    ctx.fillRect(Math.round(b.x-1),Math.round(b.y-wing),1,1);
+    ctx.fillRect(Math.round(b.x+1),Math.round(b.y-wing),1,1);
+  }
+
+  /* flores */
+  for(i=0;i<flowers.length;i++) drawFlower(flowers[i],dt);
+
+  drawBee();
+
+  /* petalos volando */
+  for(i=0;i<petals.length;i++){
+    var q=petals[i];
+    q.ph += q.sp*dt;
+    q.x += (q.vx + Math.sin(q.ph)*3)*dt;
+    q.y += (q.vy + Math.cos(q.ph*0.7)*2)*dt;
+    if(q.x>W+3){ q.x=-3; q.y=rr(0,H); }
+    if(q.y>H+3){ q.y=-3; q.x=rr(0,W); }
+    var ph=Math.sin(q.ph*1.6);
+    var w = q.big ? (ph>0?2:1) : 1;
+    var h = q.big ? (ph>0?1:2) : 1;
+    ctx.fillStyle=q.c;
+    ctx.fillRect(Math.round(q.x),Math.round(q.y),w,h);
+  }
+
+  /* destellos */
+  for(i=sparks.length-1;i>=0;i--){
+    var s=sparks[i];
+    s.life += dt;
+    if(s.life>s.max){ sparks.splice(i,1); continue; }
+    ctx.globalAlpha = 1-(s.life/s.max);
+    ctx.fillStyle=s.c;
+    ctx.fillRect(Math.round(s.x),Math.round(s.y-s.life*6),1,1);
+    ctx.globalAlpha=1;
+  }
+
+  if(heart) drawHeart(dt);
+}
+
+function drawFlower(f,dt){
+  if(f.grow<1){ f.grow = Math.min(1, f.grow + dt*1.7); }
+  var g = f.grow<1 ? easeBack(f.grow) : 1;
+  var sway = Math.sin(t*f.sp + f.ph)*f.sw;
+  var hh = Math.max(1, f.h*g);
+  var steps = Math.round(hh);
+
+  ctx.globalAlpha = f.alpha;
+  /* tallo curvado: la curvatura crece hacia la punta */
+  for(var i=0;i<=steps;i++){
+    var u = steps? i/steps : 0;
+    var X = f.x + sway*u*u;
+    var Y = f.y - i;
+    ctx.fillStyle = (i%4===0) ? f.stemD : f.stemC;
+    ctx.fillRect(Math.round(X), Math.round(Y), f.thick, 1);
+  }
+  /* hojas */
+  if(f.leaf && f.h>7 && g>0.6){
+    var lu=0.42, lx=f.x+sway*lu*lu, ly=f.y-hh*lu;
+    var ln=Math.max(2,Math.round(f.r*0.9));
+    drawLeaf(ctx,lx,ly,-1,ln,f.stemC,f.stemD);
+    if(f.h>12) drawLeaf(ctx,f.x+sway*0.36,f.y-hh*0.6,1,ln,f.stemC,f.stemD);
+  }
+  /* cabeza */
+  var hd=getHead(f.type,f.r,f.vi);
+  var hx=f.x+sway, hy=f.y-hh;
+  if(g<1){
+    var w=Math.max(1,Math.round(hd.w*g)), h2=Math.max(1,Math.round(hd.h*g));
+    ctx.drawImage(hd.c, Math.round(hx-w/2), Math.round(hy-h2/2), w, h2);
+  } else {
+    ctx.drawImage(hd.c, Math.round(hx)-hd.cx, Math.round(hy)-hd.cy);
+  }
+  ctx.globalAlpha=1;
+}
+function easeBack(x){ var c1=1.9, c3=c1+1; return 1 + c3*Math.pow(x-1,3) + c1*Math.pow(x-1,2); }
+
+/* ---------- corazon sorpresa a las 21 flores ---------- */
+function makeHeart(){
+  document.querySelector('.stage').classList.add('celebrando');
+  var pts=[], n=110;
+  var sc=Math.min(W,H)*0.0125;
+  var cx=W/2, cy=horizon*0.62;
+  for(var i=0;i<n;i++){
+    var a=i/n*TAU;
+    var x=16*Math.pow(Math.sin(a),3);
+    var y=13*Math.cos(a)-5*Math.cos(2*a)-2*Math.cos(3*a)-Math.cos(4*a);
+    pts.push({ tx:cx+x*sc, ty:cy-y*sc,
+               sx:Math.random()*W, sy:H+Math.random()*24,
+               d:Math.random()*0.7,
+               c: Math.random()<0.78 ? pick(['#FFD23F','#FFE175','#FFB627']) : '#FF7B8E' });
+  }
+  heart={pts:pts, age:0};
+  document.getElementById('cheer').classList.add('on');
+}
+function drawHeart(dt){
+  heart.age += dt;
+  var A=heart.age;
+  for(var i=0;i<heart.pts.length;i++){
+    var p=heart.pts[i];
+    var u=Math.max(0,Math.min(1,(A-p.d)/1.5));
+    var e=1-Math.pow(1-u,3);
+    var x=p.sx+(p.tx-p.sx)*e, y=p.sy+(p.ty-p.sy)*e;
+    if(u>=1){ y += Math.sin(t*1.6+i*0.3)*0.9; }
+    ctx.globalAlpha = A>9 ? Math.max(0,1-(A-9)/1.5) : 1;
+    ctx.fillStyle=p.c;
+    ctx.fillRect(Math.round(x),Math.round(y),2,2);
+    ctx.globalAlpha=1;
+  }
+  if(A>9){ document.querySelector('.stage').classList.remove('celebrando'); }
+  if(A>10.5){ heart=null; document.getElementById('cheer').classList.remove('on'); }
+}
+
+/* ---------- tamano de pantalla ---------- */
+var lastW=0,lastH=0,rt=null;
+function resize(){
+  var vw=Math.max(240,window.innerWidth), vh=Math.max(240,window.innerHeight);
+  if(vw===lastW && vh===lastH) return;
+  lastW=vw; lastH=vh;
+  S = Math.max(2, Math.round(Math.min(vw,vh)/195));
+  W = Math.ceil(vw/S); H = Math.ceil(vh/S);
+  cv.width=W; cv.height=H;
+  cv.style.width=(W*S)+'px'; cv.style.height=(H*S)+'px';
+  ctx.imageSmoothingEnabled=false;
+  headCache={};
+  build();
+}
+window.addEventListener('resize',function(){ clearTimeout(rt); rt=setTimeout(resize,160); });
+
+/* ---------- sembrar flores al tocar ---------- */
+var hintRow=document.getElementById('hintrow');
+var countEl=document.getElementById('count');
+function plantAt(clientX,clientY){
+  var r=cv.getBoundingClientRect();
+  var x=(clientX-r.left)/S, y=(clientY-r.top)/S;
+  if(x<0||x>W) return;
+  if(y < horizon+2){
+    for(var i=0;i<10;i++) sparks.push({x:x+rr(-6,6),y:y+rr(-4,4),life:0,max:0.9,c:pickR(['#FFE175','#FFFFFF','#FFD23F'])});
+    chime();
+    return;
+  }
+  y=Math.min(H-1,y);
+  addPlanted(x,y,false);
+  plantedNorm.push({nx:x/W, ny:y/H});
+  plantedCount++;
+  countEl.textContent='FLORES '+plantedCount;
+  for(var k=0;k<8;k++) sparks.push({x:x+rr(-4,4),y:y+rr(-6,0),life:0,max:0.8,c:pickR(['#FFF0B8','#FFD23F','#FFFFFF'])});
+  chime();
+  if(plantedCount===2) hintRow.classList.add('fade');
+  if(plantedCount===21 && !heart) makeHeart();
+}
+window.addEventListener('pointerdown',function(e){
+  if(e.target && e.target.closest && e.target.closest('button')) return;
+  if(!started) return;
+  plantAt(e.clientX,e.clientY);
+});
+
+/* expuesto para el arranque */
+window.__garden = { resize:resize, loop:loop };
+
+/* ===============================================================
+   MUSICA — assets/musica.mp3 (30 s en bucle).
+   Ningun navegador deja sonar audio sin un toque del usuario,
+   por eso la cancion arranca con el boton de la portada.
+================================================================*/
+var started=false, musicOn=true;
+var song=document.getElementById('song');
+var VOL=0.85;
+song.volume=0;
+
+function fadeTo(target,ms,then){
+  var from=song.volume, t0=(window.performance?performance.now():Date.now());
+  (function step(){
+    var now=(window.performance?performance.now():Date.now());
+    var k=Math.min(1,(now-t0)/ms);
+    song.volume=Math.max(0,Math.min(1,from+(target-from)*k));
+    if(k<1) requestAnimationFrame(step);
+    else if(then) then();
+  })();
+}
+function playSong(){
+  var p=song.play();
+  if(p && p.catch) p.catch(function(){ /* si el navegador lo bloquea, queda el boton */ });
+  fadeTo(VOL,1800);
+}
+
+/* notita corta al sembrar una flor */
+var sfx=null;
+function chime(){
+  if(!musicOn) return;
+  try{
+    var AC=window.AudioContext||window.webkitAudioContext; if(!AC) return;
+    if(!sfx) sfx=new AC();
+    var o=sfx.createOscillator(), g=sfx.createGain();
+    o.type='triangle';
+    o.frequency.value=pick([1046.5,1174.7,1318.5,1568,1760,2093]);
+    o.connect(g); g.connect(sfx.destination);
+    var t0=sfx.currentTime;
+    g.gain.setValueAtTime(0.0001,t0);
+    g.gain.exponentialRampToValueAtTime(0.055,t0+0.012);
+    g.gain.exponentialRampToValueAtTime(0.0001,t0+1.1);
+    o.start(t0); o.stop(t0+1.2);
+  }catch(e){}
+}
+
+/* ---------- arranque ---------- */
+var gate=document.getElementById('gate');
+var musicBtn=document.getElementById('music');
+
+document.getElementById('go').addEventListener('click',function(){
+  gate.classList.add('off');
+  setTimeout(function(){ gate.style.display='none'; },800);
+  started=true;
+  playSong();
+});
+
+musicBtn.addEventListener('click',function(){
+  musicOn=!musicOn;
+  musicBtn.classList.toggle('off',!musicOn);
+  musicBtn.innerHTML = musicOn ? '&#9834;' : '&#9834;&#822;';
+  musicBtn.setAttribute('aria-label', musicOn ? 'Silenciar la musica' : 'Activar la musica');
+  if(musicOn) playSong();
+  else fadeTo(0,350,function(){ if(!musicOn) song.pause(); });
+});
+
+/* ===============================================================
+   EL OJO QUE NUNCA SE DEJA APRETAR
+   La contrasena no existe en ningun lado del codigo: solo hay
+   puntitos. El ojo esquiva antes de que el clic llegue a contar.
+================================================================*/
+var ig=document.getElementById('ig');
+var igBtn=document.getElementById('igbtn');
+var igPie=document.getElementById('igpie');
+var intentos=0, igDx=0, igDy=0, igBase=null;
+
+/* el ojito del boton, dibujado pixel a pixel */
+var OJO=["..#####..",".#.....#.","#..###..#","#.#####.#","#..###..#",".#.....#.","..#####.."];
+(function pintaOjo(){
+  var icono=document.getElementById('igicon');
+  if(!icono) return;
+  var r='';
+  for(var y=0;y<OJO.length;y++) for(var x=0;x<OJO[y].length;x++)
+    if(OJO[y][x]==='#') r+='<rect x="'+x+'" y="'+y+'" width="1" height="1"/>';
+  icono.innerHTML='<svg viewBox="0 0 9 7" width="19" height="15" shape-rendering="crispEdges" fill="currentColor" aria-hidden="true">'+r+'</svg>';
+})();
+
+var BURLAS=[
+  'Casi...',
+  'Uy, se movió',
+  'Por poquito',
+  'No, no, no',
+  'Sigue intentando',
+  'Qué insistente',
+  'Jaja, nunca',
+  'Esta no se ve',
+  'Ni de broma',
+  'Te quiero, pero no',
+  'Nop',
+  'Se te escapó',
+  'Otra vez será',
+  'Imposible',
+  'Ni lo intentes',
+  'Sigue soñando',
+  'Ay, no'
+];
+var ultimaBurla=-1, ultimoSalto=0;
+
+/* mide donde vive el panel cuando no esta desplazado */
+function medirPanel(){
+  if(!ig) return;
+  igDx=0; igDy=0;
+  ig.style.transition='none';
+  ig.style.transform='translate(0px,0px)';
+  igBase=ig.getBoundingClientRect();
+  void ig.offsetWidth;
+  ig.style.transition='';
+}
+
+/* el panel completo salta a otro sitio de la pantalla */
+function huye(ev){
+  if(ev){ ev.preventDefault(); ev.stopPropagation(); }
+  if(!ig||!igBase) return false;
+  /* mientras el recuadro vuela pasa por debajo del cursor y volveria a
+     dispararse: un solo salto (y una sola burla) por intento */
+  var ahora = Date.now();
+  if(ahora - ultimoSalto < 430) return false;
+  ultimoSalto = ahora;
+  igBtn.style.pointerEvents='none';
+  setTimeout(function(){ igBtn.style.pointerEvents=''; }, 430);
+  var m=12, techo=64;
+  var minX = m - igBase.left;
+  var maxX = (window.innerWidth - m) - igBase.right;
+  var minY = techo - igBase.top;
+  var maxY = (window.innerHeight - m) - igBase.bottom;
+  if(maxX<minX) maxX=minX;
+  if(maxY<minY) maxY=minY;
+
+  var salto = Math.max(80, Math.min(window.innerWidth, window.innerHeight)*0.2);
+  var nx, ny, i=0;
+  do{
+    nx = minX + Math.random()*(maxX-minX);
+    ny = minY + Math.random()*(maxY-minY);
+    i++;
+  } while(i<24 && Math.hypot(nx-igDx, ny-igDy) < salto);
+
+  igDx=nx; igDy=ny;
+  ig.style.transform='translate('+Math.round(nx)+'px,'+Math.round(ny)+'px) rotate('+(Math.random()*7-3.5).toFixed(1)+'deg)';
+
+  var idx;
+  if(intentos < BURLAS.length){
+    idx = intentos;
+  } else {
+    do { idx = (Math.random()*BURLAS.length)|0; } while(idx===ultimaBurla && BURLAS.length>1);
+  }
+  ultimaBurla = idx;
+  igPie.textContent = BURLAS[idx];
+  igPie.classList.add('burla');
+  igPie.classList.remove('pop');
+  void igPie.offsetWidth;
+  igPie.classList.add('pop');
+  intentos++;
+  if(started) chime();
+  return false;
+}
+
+if(ig && igBtn){
+  igBtn.addEventListener('pointerdown', huye);
+  igBtn.addEventListener('mouseenter', huye);
+  igBtn.addEventListener('touchstart', huye, {passive:false});
+  igBtn.addEventListener('focus', huye);
+  igBtn.addEventListener('click', function(ev){ ev.preventDefault(); return false; });
+  medirPanel();
+  if(document.fonts && document.fonts.ready) document.fonts.ready.then(medirPanel);
+  window.addEventListener('resize', function(){ clearTimeout(ig.__t); ig.__t=setTimeout(medirPanel,200); });
+}
+
+/* dedicatoria opcional por la URL:  ...?para=Nombre */
+try{
+  var q=new URLSearchParams(location.search);
+  var para=(q.get('para')||'').trim().slice(0,28);
+  if(para){
+    var d=document.getElementById('dedic');
+    d.textContent='Para '+para;
+    d.hidden=false;
+  }
+}catch(e){}
+
+resize();
+requestAnimationFrame(loop);
+
+})();
+</script>
