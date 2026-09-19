@@ -148,18 +148,29 @@
      degradado; encima viaja un destello blanco separado, como cuando
      inclinas una tarjeta de foil. */
   .cuponwrap{
+    position:absolute;
+    top:46%;right:0;
+    width:min(272px,74vw);
     pointer-events:none;
-    display:flex;flex-direction:column;align-items:center;gap:9px;
-    width:min(320px,100%);
-    margin-top:22px;
+    z-index:6;
+    transition:transform .58s cubic-bezier(.2,1.12,.35,1);
   }
+  .cuponwrap.abierto{z-index:8;}
+  .cupon-velo{
+    position:fixed;inset:0;z-index:7;
+    background:rgba(16,26,12,.46);
+    opacity:0;pointer-events:none;
+    transition:opacity .45s ease;
+  }
+  .cupon-velo.on{opacity:1;pointer-events:auto;cursor:pointer;}
   .cupon{
     position:relative;
-    width:100%;
+    display:block;width:100%;
+    pointer-events:auto;cursor:pointer;
+    border:0;font:inherit;
     padding:16px 18px 15px;
     box-sizing:border-box;
     border-radius:14px;
-    transform:rotate(-1.8deg);
     overflow:hidden;
     background:linear-gradient(146deg,
       #7E5F17 0%, #B78D22 9%, #E0BC48 18%,
@@ -197,6 +208,7 @@
     100%{left:115%;}
   }
   .cupon-eyebrow{
+    display:block;
     position:relative;z-index:1;
     font-family:"Nunito",Arial,sans-serif;
     font-size:clamp(9px,2.3vw,11px);
@@ -205,6 +217,7 @@
     text-shadow:0 1px 0 rgba(255,250,220,.65);
   }
   .cupon-main{
+    display:block;
     position:relative;z-index:1;
     font-family:"Playfair Display",Georgia,serif;
     font-weight:700;
@@ -215,6 +228,7 @@
     text-shadow:0 1px 0 rgba(255,252,230,.75), 0 -1px 0 rgba(86,58,6,.22);
   }
   .cupon-pie{
+    display:block;
     position:relative;z-index:1;
     font-family:"Nunito",Arial,sans-serif;
     font-size:clamp(10px,2.4vw,11.5px);
@@ -222,17 +236,9 @@
     color:#5F4209;
     text-shadow:0 1px 0 rgba(255,250,220,.55);
   }
-  .cupon-nota{
-    font-family:"Nunito",Arial,sans-serif;
-    font-size:clamp(12px,3.1vw,14px);
-    font-weight:700;text-align:center;
-    color:#33270C;
-    text-shadow:0 1px 0 rgba(255,255,255,.65);
-    text-wrap:balance;
-    max-width:100%;
-  }
+  .cupon:focus-visible{outline:3px solid #fff;outline-offset:4px;}
   @media (min-width:820px){
-    .cuponwrap{position:absolute;top:80px;right:18px;margin-top:0;width:286px;}
+    .cuponwrap{top:88px;width:286px;}
   }
   @media (prefers-reduced-motion:reduce){
     .cupon::after{animation:none;opacity:0;}
@@ -353,13 +359,12 @@
       <h1>¡Feliz Primavera!</h1>
       <div class="sub">Con cariño, Mohammed</div>
 
-      <div class="cuponwrap">
-        <div class="cupon">
-          <div class="cupon-eyebrow">Cupón de regalo</div>
-          <div class="cupon-main">Un arreglo de uñas</div>
-          <div class="cupon-pie">Sin vencimiento · Cuando tú quieras</div>
-        </div>
-        <div class="cupon-nota">Pásame tu cuenta del banco&nbsp;💸</div>
+      <div class="cuponwrap" id="cuponwrap">
+        <button class="cupon" id="cupon" aria-label="Abrir el cupón de regalo">
+          <span class="cupon-eyebrow">Cupón de regalo</span>
+          <span class="cupon-main">Un arreglo de uñas</span>
+          <span class="cupon-pie">Sin vencimiento · Cuando tú quieras</span>
+        </button>
       </div>
     </header>
 
@@ -390,6 +395,8 @@
     <div class="big">21 flores para el 21</div>
     <div class="small">GRACIAS POR EXISTIR</div>
   </div>
+
+  <div class="cupon-velo" id="cuponvelo"></div>
 
   <button class="music" id="music" aria-label="Activar o silenciar la música">&#9834;</button>
 
@@ -1163,6 +1170,74 @@ if(ig && igBtn){
   medirPanel();
   if(document.fonts && document.fonts.ready) document.fonts.ready.then(medirPanel);
   window.addEventListener('resize', function(){ clearTimeout(ig.__t); ig.__t=setTimeout(medirPanel,200); });
+}
+
+/* ===============================================================
+   EL CUPON: se guarda asomando por la derecha y al apretarlo
+   viaja al centro de la pantalla y se agranda.
+================================================================*/
+var cupWrap=document.getElementById('cuponwrap');
+var cupon=document.getElementById('cupon');
+var cupVelo=document.getElementById('cuponvelo');
+var cupAbierto=false, cupBase=null, cupTimer=null, cupGuino=null;
+var GUARDADO='translateX(67%) rotate(-3deg)';
+var ASOMADO ='translateX(58%) rotate(-3deg)';
+
+/* mide donde esta el cupon sin ningun desplazamiento */
+function medirCupon(){
+  if(!cupWrap) return;
+  var previo=cupWrap.style.transition;
+  cupWrap.style.transition='none';
+  cupWrap.style.transform='none';
+  cupBase=cupWrap.getBoundingClientRect();
+  cupWrap.style.transform = cupAbierto ? cupWrap.style.transform : GUARDADO;
+  void cupWrap.offsetWidth;
+  cupWrap.style.transition=previo||'';
+  if(cupAbierto) abrirCupon(true);
+}
+
+function abrirCupon(silencioso){
+  if(!cupWrap||!cupBase) return;
+  cupAbierto=true;
+  cupWrap.classList.add('abierto');
+  cupVelo.classList.add('on');
+  var esc = Math.min(1.5, (window.innerWidth - 36) / cupBase.width);
+  if(esc < 1) esc = 1;
+  var dx = (window.innerWidth/2)  - (cupBase.left + cupBase.width/2);
+  var dy = (window.innerHeight/2) - (cupBase.top  + cupBase.height/2);
+  cupWrap.style.transform='translate('+Math.round(dx)+'px,'+Math.round(dy)+'px) scale('+esc.toFixed(3)+') rotate(0deg)';
+  cupon.setAttribute('aria-label','Guardar el cupón');
+  if(!silencioso && started) chime();
+}
+
+function cerrarCupon(){
+  if(!cupWrap) return;
+  cupAbierto=false;
+  cupWrap.classList.remove('abierto');
+  cupVelo.classList.remove('on');
+  cupWrap.style.transform=GUARDADO;
+  cupon.setAttribute('aria-label','Abrir el cupón de regalo');
+}
+
+/* cada tanto se asoma un poquito mas, para que se note que esta ahi */
+function guinoCupon(){
+  if(cupAbierto||!cupWrap) return;
+  cupWrap.style.transform=ASOMADO;
+  setTimeout(function(){ if(!cupAbierto) cupWrap.style.transform=GUARDADO; }, 700);
+}
+
+if(cupWrap && cupon){
+  cupWrap.style.transform=GUARDADO;
+  medirCupon();
+  if(document.fonts && document.fonts.ready) document.fonts.ready.then(medirCupon);
+  cupon.addEventListener('click', function(ev){
+    ev.preventDefault(); ev.stopPropagation();
+    if(cupAbierto) cerrarCupon(); else abrirCupon(false);
+  });
+  cupVelo.addEventListener('click', function(ev){ ev.stopPropagation(); cerrarCupon(); });
+  window.addEventListener('keydown', function(ev){ if(ev.key==='Escape' && cupAbierto) cerrarCupon(); });
+  window.addEventListener('resize', function(){ clearTimeout(cupTimer); cupTimer=setTimeout(medirCupon,220); });
+  cupGuino=setInterval(guinoCupon, 5200);
 }
 
 /* dedicatoria opcional por la URL:  ...?para=Nombre */

@@ -33,6 +33,8 @@ Para un dominio propio: cómpralo, apúntalo a GitHub Pages y ponlo en
 - Todo el dibujo es código: no hay imágenes. Se pinta en un canvas de baja
   resolución y se escala con pixeles duros (`image-rendering: pixelated`).
 - Tocando el campo se siembran flores nuevas. A las 21 aparece una sorpresa.
+- El cupón de regalo se guarda asomando por el borde derecho; al tocarlo
+  viaja al centro de la pantalla y se agranda. Se cierra tocando fuera o con Esc.
 - El botón "Ver contraseña" es una broma: al intentar tocarlo, el recuadro
   entero salta a otro sitio. **No hay ninguna contraseña en el código**, solo
   puntitos — nada que se pueda leer viendo el código fuente de la página.
