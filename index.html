@@ -153,8 +153,11 @@
     width:min(272px,74vw);
     pointer-events:none;
     z-index:6;
-    transition:transform .58s cubic-bezier(.2,1.12,.35,1);
+    opacity:0;
+    transition:transform .62s cubic-bezier(.2,1.12,.35,1), opacity .5s ease;
   }
+  .cuponwrap.listo{opacity:1;}
+  .cuponwrap:not(.listo) .cupon{pointer-events:none;}
   .cuponwrap.abierto{z-index:8;}
   .cupon-velo{
     position:fixed;inset:0;z-index:7;
@@ -226,6 +229,11 @@
     color:#402B04;
     margin:6px 0 5px;
     text-shadow:0 1px 0 rgba(255,252,230,.75), 0 -1px 0 rgba(86,58,6,.22);
+  }
+  .cupon-mas{
+    display:inline-block;
+    font-size:.82em;
+    margin-top:1px;
   }
   .cupon-pie{
     display:block;
@@ -362,7 +370,7 @@
       <div class="cuponwrap" id="cuponwrap">
         <button class="cupon" id="cupon" aria-label="Abrir el cupón de regalo">
           <span class="cupon-eyebrow">Cupón de regalo</span>
-          <span class="cupon-main">Un arreglo de uñas</span>
+          <span class="cupon-main">Un arreglo de uñas<br><span class="cupon-mas">+ masaje</span></span>
           <span class="cupon-pie">Sin vencimiento · Cuando tú quieras</span>
         </button>
       </div>
@@ -1050,6 +1058,13 @@ document.getElementById('go').addEventListener('click',function(){
   setTimeout(function(){ gate.style.display='none'; },800);
   started=true;
   playSong();
+  /* el cupon entra deslizando desde fuera, ya con el jardin a la vista */
+  setTimeout(function(){
+    if(!cupWrap) return;
+    cupListo=true;
+    cupWrap.classList.add('listo');
+    cupWrap.style.transform=GUARDADO;
+  }, 950);
 });
 
 musicBtn.addEventListener('click',function(){
@@ -1179,7 +1194,8 @@ if(ig && igBtn){
 var cupWrap=document.getElementById('cuponwrap');
 var cupon=document.getElementById('cupon');
 var cupVelo=document.getElementById('cuponvelo');
-var cupAbierto=false, cupBase=null, cupTimer=null, cupGuino=null;
+var cupAbierto=false, cupListo=false, cupBase=null, cupTimer=null, cupGuino=null;
+var ESCONDIDO='translateX(120%) rotate(-3deg)';
 var GUARDADO='translateX(67%) rotate(-3deg)';
 var ASOMADO ='translateX(58%) rotate(-3deg)';
 
@@ -1190,7 +1206,7 @@ function medirCupon(){
   cupWrap.style.transition='none';
   cupWrap.style.transform='none';
   cupBase=cupWrap.getBoundingClientRect();
-  cupWrap.style.transform = cupAbierto ? cupWrap.style.transform : GUARDADO;
+  cupWrap.style.transform = cupAbierto ? cupWrap.style.transform : (cupListo ? GUARDADO : ESCONDIDO);
   void cupWrap.offsetWidth;
   cupWrap.style.transition=previo||'';
   if(cupAbierto) abrirCupon(true);
@@ -1221,13 +1237,13 @@ function cerrarCupon(){
 
 /* cada tanto se asoma un poquito mas, para que se note que esta ahi */
 function guinoCupon(){
-  if(cupAbierto||!cupWrap) return;
+  if(cupAbierto||!cupListo||!cupWrap) return;
   cupWrap.style.transform=ASOMADO;
   setTimeout(function(){ if(!cupAbierto) cupWrap.style.transform=GUARDADO; }, 700);
 }
 
 if(cupWrap && cupon){
-  cupWrap.style.transform=GUARDADO;
+  cupWrap.style.transform=ESCONDIDO;
   medirCupon();
   if(document.fonts && document.fonts.ready) document.fonts.ready.then(medirCupon);
   cupon.addEventListener('click', function(ev){
